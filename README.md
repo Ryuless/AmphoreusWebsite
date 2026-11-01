@@ -109,6 +109,18 @@ Deploy rules:
 firebase deploy --only firestore:rules
 ```
 
+### Vercel
+
+Project ini menggunakan Vite dan dapat dideploy langsung ke Vercel. Konfigurasi [vercel.json](./vercel.json) menyediakan fallback SPA agar route seperti `/gallery`, `/council`, dan `/agenda` tidak menghasilkan 404 saat dibuka langsung.
+
+Gunakan pengaturan berikut jika Vercel meminta konfigurasi manual:
+
+```text
+Build Command: npm run build
+Output Directory: dist
+Install Command: npm install
+```
+
 ## Route
 
 Routing ringan memakai pathname melalui [src/hooks/usePage.js](./src/hooks/usePage.js), tanpa React Router.
