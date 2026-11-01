@@ -21,8 +21,10 @@ export const editorFields = {
   ],
   agenda: [
     ['title', 'Title', 'text'],
+    ['category', 'Category', 'select', ['Agenda', 'Program Kerja']],
     ['status', 'Status', 'text'],
-    ['owner', 'Owner', 'text'],
+    ['role', 'Role', 'select', ['Primordial', 'Titan', 'Olympus', 'Demigod']],
+    ['owner', 'Owner', 'select', []],
     ['detail', 'Detail', 'textarea'],
   ],
 }

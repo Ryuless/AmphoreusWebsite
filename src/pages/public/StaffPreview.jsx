@@ -1,5 +1,5 @@
 import { Arrow } from '../../components/Arrow'
-import { getImageUrl } from '../../utils/imageUrl'
+import { RemoteImage } from '../../components/RemoteImage'
 
 export function StaffPreview({ staff }) {
   return (
@@ -7,7 +7,7 @@ export function StaffPreview({ staff }) {
       {staff.map((person, index) => (
         <article className="staff-preview__person reveal" key={person.id}>
           <div className="staff-preview__image">
-            <img src={getImageUrl(person.image)} alt={`${person.name} profile`} />
+            <RemoteImage src={person.image} alt={`${person.name} profile`} />
             <span className="staff-preview__number">0{index + 1}</span>
           </div>
           <div className="staff-preview__details">

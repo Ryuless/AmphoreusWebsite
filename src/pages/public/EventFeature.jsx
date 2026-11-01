@@ -1,12 +1,12 @@
 import { Arrow } from '../../components/Arrow'
+import { RemoteImage } from '../../components/RemoteImage'
 import { formatDate } from '../../utils/formatDate'
-import { getImageUrl } from '../../utils/imageUrl'
 
-export function EventFeature({ event }) {
+export function EventFeature({ event, onOpen }) {
   if (!event) return <p className="empty-state">The horizon is quiet for now. Check back soon.</p>
   return (
-    <div className="event-feature">
-      <img src={getImageUrl(event.image)} alt="" />
+    <div className="event-feature event-feature--clickable" onClick={() => onOpen?.(event)} onKeyDown={(keyboardEvent) => { if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') onOpen?.(event) }} role={onOpen ? 'button' : undefined} tabIndex={onOpen ? 0 : undefined}>
+      <RemoteImage src={event.image} alt="" />
       <div className="event-feature__copy">
         <p className="eyebrow">{event.type} · {formatDate(event.date)}</p>
         <h2>{event.title}</h2>

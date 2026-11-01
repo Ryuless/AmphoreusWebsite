@@ -19,6 +19,8 @@ export const defaultContent = {
       'A quiet constellation for people who build, explore, and care for a world together.',
     bio:
       'Amphoreus is a small, thoughtful corner of the internet. We gather around stories, events, and the simple joy of making something worth returning to.',
+    featuredGalleryIds: [],
+    featuredEventIds: [],
   },
   events: [
     {
@@ -93,22 +95,25 @@ export const defaultContent = {
     {
       id: 'open-door',
       title: 'Open the door',
+      category: 'Agenda',
       status: 'In motion',
-      owner: 'Primordial',
+      role: 'Primordial',
       detail: 'Keep introductions easy, kind, and visible for every new arrival.',
     },
     {
       id: 'seasonal-program',
       title: 'Seasonal program',
+      category: 'Program Kerja',
       status: 'Next up',
-      owner: 'Titan · Events',
+      role: 'Titan',
       detail: 'Shape one small, memorable gathering for each season of the server.',
     },
     {
       id: 'clear-signal',
       title: 'Clear signal',
+      category: 'Agenda',
       status: 'Ongoing',
-      owner: 'Demigod',
+      role: 'Demigod',
       detail: 'Make important notices calm, concise, and impossible to miss.',
     },
   ],

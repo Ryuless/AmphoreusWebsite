@@ -1,26 +1,28 @@
 import { PageIntro } from '../../components/PageIntro'
-import { getImageUrl } from '../../utils/imageUrl'
+import { RemoteImage } from '../../components/RemoteImage'
 
 export function CouncilPage({ site, staff }) {
   return (
-    <>
+    <div className="observatory-page observatory-page--council">
       <PageIntro number="03" eyebrow="The people who keep watch" title="Council">
         <p>{site.bio}</p>
       </PageIntro>
-      <section className="staff-list">
+      <section className="council-grid">
         {staff.map((person, index) => (
-          <article className="staff-row reveal" key={person.id}>
-            <span className="staff-number">0{index + 1}</span>
-            <img src={getImageUrl(person.image)} alt="" />
-            <div className="staff-info">
+          <article className="council-card reveal" key={person.id}>
+            <div className="council-card__image">
+              <RemoteImage src={person.image} alt={`${person.name} profile`} />
+              <span>0{index + 1}</span>
+            </div>
+            <div className="council-card__body">
               <p className="eyebrow">{person.role}</p>
               <h2>{person.name}</h2>
+              <span className="council-card__focus">{person.focus}</span>
               <p>{person.bio}</p>
             </div>
-            <span className="staff-focus">{person.focus}</span>
           </article>
         ))}
       </section>
-    </>
+    </div>
   )
 }
