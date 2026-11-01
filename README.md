@@ -1,89 +1,275 @@
 # Amphoreus Universe
 
-The public community website for Amphoreus Universe, built with React, Vite, Firebase Authentication, and Firestore.
+Website komunitas Amphoreus Universe dengan visual observatory/celestial. Project ini memiliki website publik dan dashboard admin untuk mengelola event, staff/council, gallery, agenda, profil website, serta carousel Homepage.
 
-## Project structure
+## Fitur
 
-```text
-src/
-├── components/       # Shared visual pieces: mark, arrow, header, footer, intro
-├── data/             # Default public content and local-storage persistence helpers
-├── hooks/             # URL routing and Firestore/local content state
-├── pages/
-│   ├── public/       # One component per public page
-│   └── admin/        # Private login, dashboard, and CRUD editor
-└── utils/             # Small shared formatting helpers
-```
+### Website publik
 
-`src/App.jsx` is intentionally kept as a small route boundary. Page-specific UI lives in its matching `pages/` folder.
+- Homepage observatory dengan starfield, statistik, council preview, carousel event, carousel gallery, dan field log.
+- Chronicle untuk daftar event.
+- Gallery dengan grid gambar dan popup detail.
+- Council untuk profil staff.
+- Agenda untuk Agenda dan Program Kerja.
+- Filter Agenda berdasarkan Type dan Role.
+- Popup detail untuk event, agenda, dan gambar gallery.
+- Zoom gambar pada popup event.
+- Keyboard support: `Enter`, `Space`, dan `Escape`.
+- Dark/light theme yang disimpan di browser.
+- Dukungan URL gambar langsung, Google Drive, Pinterest, dan `pin.it`.
 
-The interface has two themes: dark is the default, and the light theme is available from the theme toggle in the public header and control room. The selected theme is remembered in the browser.
+### Homepage carousel
 
-## Run locally
+Menu **Carousel** pada dashboard mengatur dua carousel secara terpisah:
+
+- Event Carousel: maksimal 5 event.
+- Gallery Carousel: maksimal 5 gambar.
+- Urutan mengikuti urutan pilihan yang disimpan.
+- Jika pengaturan belum tersedia pada data lama, item default digunakan hingga maksimal 5.
+- Jika pengaturan sudah tersedia tetapi tidak ada item yang dicentang, carousel kosong.
+- Field Log tetap menampilkan maksimal 3 event terbaru dari seluruh koleksi event, terpisah dari Event Carousel.
+
+### Dashboard admin
+
+Dashboard tersedia pada `/celestial-control` dan membutuhkan Firebase Email/Password Authentication.
+
+| Menu | Fungsi |
+| --- | --- |
+| Events | CRUD event dan pengumuman |
+| Staff | CRUD profil council/staff |
+| Gallery | CRUD gambar dan kredit |
+| Agenda | CRUD Agenda dan Program Kerja |
+| Carousel | Memilih maksimal 5 event dan 5 gallery untuk Homepage |
+| Site profile | Mengatur eyebrow, intro, dan bio website |
+
+Fitur admin:
+
+- Status koneksi Firestore: local, syncing, synced, atau error.
+- Fallback/cache konten melalui localStorage.
+- Notifikasi kecil setelah pengaturan carousel berhasil disimpan.
+- Owner Agenda berupa dropdown dinamis dari nama Staff.
+- Logout otomatis saat meninggalkan dashboard.
+
+## Teknologi
+
+- React 19
+- React DOM 19
+- Vite 8
+- Firebase 13
+  - Firebase Authentication
+  - Cloud Firestore
+- Oxlint
+- CSS custom responsive
+
+## Menjalankan project
+
+Persyaratan: Node.js modern dan npm.
 
 ```bash
+git clone <repository-url>
+cd AmphoreusWebsite
 npm install
 npm run dev
 ```
 
-The production checks are:
+Command lain:
 
 ```bash
-npm run lint
-npm run build
+npm run lint       # Menjalankan Oxlint
+npm run build      # Membuat production build
+npm run preview    # Preview production build
+git diff --check   # Memeriksa whitespace pada perubahan
 ```
 
-## Routes
+## Konfigurasi Firebase
 
-The public site uses clean URL paths so every area has a direct link:
+Konfigurasi client berada di [src/firebase.js](./src/firebase.js). Gunakan environment variable Vite berikut jika ingin mengganti konfigurasi default:
 
-- `/home` — introduction and the next event
-- `/chronicle` — events and announcements
-- `/gallery` — external image gallery
-- `/council` — staff profiles and the council message
-- `/agenda` — administration programs
-- `/celestial-control` — private admin route
-
-Firebase Hosting rewrites these paths to the React entry point. Existing `#/...` links are migrated to their clean path automatically.
-
-The control room always requires Firebase Email/Password Authentication. The route being non-public is only a discovery measure; Firebase Authentication is the actual access control.
-
-## Firebase
-
-The web configuration is kept in `src/firebase.js` and can be overridden with Vite environment variables:
-
-```bash
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
+```env
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
 ```
 
-Create the council account in Firebase Authentication using Email/Password, then use that account on the control-room route. Never put the Firebase Admin SDK service-account JSON in this project or in client-side code.
+File [`.env.example`](./.env.example) berisi contoh konfigurasi Firebase Admin SDK untuk proses server-side/seed. Jangan commit `.env`, private key, atau service-account JSON.
 
-The configured council email is `celestial@gmail.com` and the login form pre-fills it for convenience. Set or reset its password in Firebase Console under **Authentication → Users**; the password is intentionally not stored in this repository.
+Aktifkan Email/Password Authentication pada Firebase Console dan buat akun admin. Route admin bukan pengganti authentication; akses sebenarnya tetap dikontrol Firebase Authentication.
 
-Firestore collections used by the dashboard:
+Rules Firestore berada di [firestore.rules](./firestore.rules):
 
-- `site/public` — public intro and bio
-- `events` — event and announcement entries
-- `staff` — council profiles and roles
-- `gallery` — external image URLs and credits
-- `agenda` — programs of work
+- Read konten publik diizinkan.
+- Write membutuhkan user Firebase yang terautentikasi.
 
-Image fields accept normal image URLs and Google Drive sharing links such as
-`https://drive.google.com/file/d/FILE_ID/view?usp=drive_link`. Drive files must
-be shared as **Anyone with the link** so browsers can load the image. Drive
-links are converted to Google's direct image host for reliable embedding.
-
-The app also keeps a local draft in browser storage. This lets the public experience remain usable when Firestore is unavailable; dashboard writes are mirrored to Firestore when the connection and permissions are available.
-
-Public pages and the control room use Firestore realtime listeners. A successful dashboard write is reflected in open homepage tabs without a manual refresh. If a write or listener fails, the control room shows the Firebase error instead of reporting a false success.
-
-Deploy the rules with the Firebase CLI from this directory:
+Deploy rules:
 
 ```bash
 firebase deploy --only firestore:rules
 ```
+
+## Route
+
+Routing ringan memakai pathname melalui [src/hooks/usePage.js](./src/hooks/usePage.js), tanpa React Router.
+
+### Public
+
+```text
+/home
+/chronicle
+/gallery
+/council
+/agenda
+```
+
+### Admin
+
+```text
+/celestial-control/events
+/celestial-control/staff
+/celestial-control/gallery
+/celestial-control/agenda
+/celestial-control/carousel
+/celestial-control/site
+```
+
+Hash route lama (`#/...`) otomatis dinormalisasi ke clean URL.
+
+## Struktur data Firestore
+
+### `site/public`
+
+```js
+{
+  name: 'Amphoreus Universe',
+  eyebrow: '...',
+  intro: '...',
+  bio: '...',
+  featuredGalleryIds: ['gallery-id-1'],
+  featuredEventIds: ['event-id-1']
+}
+```
+
+`featuredGalleryIds` dan `featuredEventIds` masing-masing dibatasi maksimal 5 melalui dashboard.
+
+### `events`
+
+```js
+{
+  id: 'event-id',
+  title: 'Event title',
+  date: '2026-07-12',
+  type: 'Gathering',
+  location: 'The Astral Hall',
+  summary: 'Event summary',
+  image: 'https://...'
+}
+```
+
+### `staff`
+
+```js
+{
+  id: 'staff-id',
+  name: 'Staff name',
+  role: 'Primordial',
+  focus: 'Direction & care',
+  bio: 'Staff biography',
+  image: 'https://...'
+}
+```
+
+Role bawaan: `Primordial`, `Titan`, `Olympus`, dan `Demigod`.
+
+### `gallery`
+
+```js
+{
+  id: 'gallery-id',
+  title: 'Image title',
+  credit: 'Image credit',
+  image: 'https://...'
+}
+```
+
+### `agenda`
+
+```js
+{
+  id: 'agenda-id',
+  title: 'Agenda title',
+  category: 'Agenda',
+  status: 'In motion',
+  role: 'Primordial',
+  owner: 'Staff name',
+  detail: 'Agenda detail'
+}
+```
+
+Category bawaan: `Agenda` dan `Program Kerja`.
+
+## Sinkronisasi dan penyimpanan
+
+[src/hooks/useContentStore.js](./src/hooks/useContentStore.js) melakukan hal berikut:
+
+1. Membaca initial state dari localStorage.
+2. Mendengarkan update realtime Firestore.
+3. Menulis perubahan ke localStorage.
+4. Menyimpan item ke koleksi Firestore.
+5. Menghapus item dari Firestore dan state lokal.
+6. Menampilkan status sinkronisasi dan error secara eksplisit.
+
+Key localStorage:
+
+```text
+amphoreus-universe-content
+amphoreus-universe-theme
+```
+
+Default content dan nama koleksi berada di [src/data/content.js](./src/data/content.js).
+
+## Gambar eksternal
+
+[src/components/RemoteImage.jsx](./src/components/RemoteImage.jsx) mendukung:
+
+- URL file gambar langsung.
+- URL sharing Google Drive.
+- URL halaman Pinterest melalui oEmbed.
+- Domain `pin.it`.
+
+Pastikan file atau halaman gambar dapat diakses publik. Pinterest page URL tidak selalu merupakan URL file gambar langsung, sehingga komponen menggunakan resolver oEmbed.
+
+## Struktur kode
+
+- [src/App.jsx](./src/App.jsx): route boundary dan admin logout guard.
+- [src/App.css](./src/App.css): sistem visual publik dan admin.
+- [src/pages/admin/AdminPanel.jsx](./src/pages/admin/AdminPanel.jsx): shell dashboard.
+- [src/pages/admin/Editor.jsx](./src/pages/admin/Editor.jsx): form CRUD.
+- [src/pages/admin/editorFields.js](./src/pages/admin/editorFields.js): definisi field tiap koleksi.
+- [src/pages/public/HomePage.jsx](./src/pages/public/HomePage.jsx): Homepage.
+- [src/pages/public/HomeCarousel.jsx](./src/pages/public/HomeCarousel.jsx): carousel event/gallery.
+- [src/pages/public/AgendaPage.jsx](./src/pages/public/AgendaPage.jsx): Agenda dan filter.
+- [src/pages/public/EventDialog.jsx](./src/pages/public/EventDialog.jsx): popup event dan zoom.
+- [src/pages/public/AgendaDialog.jsx](./src/pages/public/AgendaDialog.jsx): popup Agenda.
+- [src/pages/public/GalleryDialog.jsx](./src/pages/public/GalleryDialog.jsx): popup gallery.
+- [src/pages/public/PublicSite.jsx](./src/pages/public/PublicSite.jsx): pemetaan halaman publik.
+- [src/data/content.js](./src/data/content.js): default content dan local persistence.
+
+## Validasi sebelum deploy
+
+```bash
+npm run lint
+npm run build
+git diff --check
+```
+
+Vite dapat menampilkan warning ukuran JavaScript chunk lebih dari 500 kB. Warning tersebut tidak menggagalkan build apabila proses berakhir sukses.
+
+## Keamanan
+
+- Jangan commit `.env` atau service-account JSON.
+- Jangan menaruh Firebase private key pada kode client.
+- Batasi akun Firebase yang memiliki akses admin.
+- Review [firestore.rules](./firestore.rules) sebelum production.
+- Gunakan gambar dan materi eksternal yang memiliki izin penggunaan.
