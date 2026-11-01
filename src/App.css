@@ -724,7 +724,14 @@ h1 i, .admin-heading h1 i { color: var(--forest); font-weight: 500; }
 @media (max-width: 800px) {
   .site-header { height: 80px; }
   .main-nav { gap: 13px; margin: 0; }
-  .main-nav a:nth-child(n+4), .header-note { display: none; }
+  .public-shell .main-nav {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .public-shell .main-nav::-webkit-scrollbar { display: none; }
+  .public-shell .header-note { display: none; }
   .header-actions { gap: 10px; }
   .header-actions .theme-toggle { font-size: 0; }
   .header-actions .theme-toggle__dot { height: 10px; width: 10px; }
